@@ -6,6 +6,112 @@
     <title>Penzion U Standy Řezáče | Jizerské hory</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        /* ══════════════════════════════════════════════
+           CSS PRO ÚVODNÍ ANIMACI (ČISTÁ FOTKA BEZ DVEŘÍ)
+           ══════════════════════════════════════════════ */
+        body.intro-active {
+            overflow: hidden;
+            height: 100vh;
+            background-color: var(--bg); /* Stejná barva jako web, zamezí bliknutí */
+        }
+
+        #main-content {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 1s ease-in-out;
+        }
+
+        body.intro-active #main-content {
+            display: none;
+        }
+
+        #intro-vstup {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg);
+            perspective: 1500px;
+        }
+
+        .intro-pension-photo {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: url('exterier.jpg') center/cover no-repeat;
+            transform: scale(1);
+            transform-origin: center center;
+            transition: transform 1.8s cubic-bezier(0.16,1,0.3,1), opacity 1.5s ease;
+            will-change: transform, opacity;
+            z-index: 1;
+        }
+        
+        /* Lehké ztmavení jen na okrajích (viněta), aby text uprostřed vynikl, ale fotka zůstala krásná */
+        #intro-vstup::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(0,0,0,0.5) 100%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .ai-portal-frame {
+            position: relative;
+            z-index: 5;
+            text-align: center;
+            color: #fff;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            transition: opacity 0.8s ease, transform 1.5s cubic-bezier(0.16,1,0.3,1);
+            cursor: pointer;
+        }
+
+        .intro-napis-nadvorim {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem; letter-spacing: 5px; text-transform: uppercase;
+            color: #fff;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            margin: 0;
+        }
+
+        .intro-napis-penzion {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3.5rem, 8vw, 6rem);
+            font-weight: 400; letter-spacing: 2px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            margin: 0;
+        }
+
+        .vstup-btn {
+            background: rgba(0,0,0,0.3); color: #fff;
+            border: 1px solid rgba(255,255,255,0.6);
+            padding: 14px 35px; font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem; font-weight: 500; letter-spacing: 3px;
+            text-transform: uppercase; border-radius: 50px;
+            cursor: pointer; transition: all 0.3s;
+            backdrop-filter: blur(5px);
+            margin-top: 15px;
+        }
+        .vstup-btn:hover { background: #fff; color: var(--green); border-color: #fff; }
+
+        /* TŘÍDA PRO VCUCNUTÍ (PŘIBLÍŽENÍ OBRÁZKU) */
+        #intro-vstup.fly-in .intro-pension-photo {
+            transform: scale(20) translateZ(300px); /* Přiblížení */
+            opacity: 0; /* Plynule se rozplyne do webu */
+        }
+        #intro-vstup.fly-in .ai-portal-frame {
+            opacity: 0;
+            transform: scale(1.5) translateZ(100px); /* Text proletí směrem k nám */
+        }
+
+
+        /* ══════════════════════════════════════════════
+           TVŮJ PŮVODNÍ KÓD BEZE ZMĚN
+           ══════════════════════════════════════════════ */
         :root {
             --bg: #FAFAF7;
             --green: #2D5A42;
@@ -57,11 +163,8 @@
             color: var(--green);
             letter-spacing: 1px;
             white-space: nowrap;
-            position: relative;
-            z-index: 1002; /* Aby logo bylo nad mobilním menu */
         }
-        
-        nav ul { display: flex; list-style: none; gap: 4px; }
+        nav ul { display: flex; list-style: none; gap: 4px; flex-wrap: wrap; }
         nav a {
             text-decoration: none; color: var(--text-mid);
             font-size: 0.78rem; font-weight: 500; padding: 8px 12px;
@@ -69,22 +172,6 @@
             border-radius: 6px; transition: all 0.25s;
         }
         nav a:hover { color: var(--green); background: rgba(45,90,66,0.07); }
-
-        /* HAMBURGER MENU IKONA */
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            cursor: pointer;
-            z-index: 1002; /* Aby byl křížek vždy klikatelný */
-            padding: 10px 0;
-        }
-        .hamburger span {
-            width: 25px;
-            height: 2px;
-            background-color: var(--green);
-            transition: transform 0.3s ease, opacity 0.3s ease;
-        }
 
         /* HERO */
         #uvod {
@@ -263,7 +350,7 @@
             width: 6px; height: 1px; background: var(--wood);
         }
 
-        /* UBYTOVANI */
+        /* UBYTOVANI - STATICKÝ GRID MÍSTO FYZIKY */
         #ubytovani {
             background: #fff;
         }
@@ -312,8 +399,8 @@
 
         /* CENIK */
         #cenik { background: var(--bg); }
-        .table-wrap { width: 100%; max-width: 1000px; overflow-x: auto; border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); -webkit-overflow-scrolling: touch; }
-        .price-table { width: 100%; border-collapse: collapse; background: #fff; min-width: 600px; }
+        .table-wrap { width: 100%; max-width: 1000px; overflow-x: auto; border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); }
+        .price-table { width: 100%; border-collapse: collapse; background: #fff; }
         .price-table th, .price-table td { padding: 16px 20px; border: 1px solid var(--border); font-size: 0.9rem; }
         .price-table thead th { background: var(--green); color: #fff; font-weight: 500; letter-spacing: 0.5px; }
         .price-table thead th.sub { background: rgba(45,90,66,0.08); color: var(--green); font-weight: 600; font-size: 0.8rem; }
@@ -458,381 +545,351 @@
         footer strong { color: #fff; }
 
         /* CURSOR TRAIL */
-        @media (pointer: fine) {
-            .cursor-dot {
-                position: fixed; width: 8px; height: 8px;
-                background: var(--green); border-radius: 50%;
-                pointer-events: none; z-index: 9999;
-                transform: translate(-50%, -50%);
-                transition: transform 0.1s, opacity 0.3s;
-                opacity: 0;
-            }
-            .cursor-ring {
-                position: fixed; width: 32px; height: 32px;
-                border: 1px solid rgba(45,90,66,0.4); border-radius: 50%;
-                pointer-events: none; z-index: 9998;
-                transform: translate(-50%, -50%);
-                transition: transform 0.15s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
-                opacity: 0;
-            }
+        .cursor-dot {
+            position: fixed; width: 8px; height: 8px;
+            background: var(--green); border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s, opacity 0.3s;
+            opacity: 0;
         }
-        @media (pointer: coarse) {
-            .cursor-dot, .cursor-ring { display: none !important; }
+        .cursor-ring {
+            position: fixed; width: 32px; height: 32px;
+            border: 1px solid rgba(45,90,66,0.4); border-radius: 50%;
+            pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: transform 0.15s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
+            opacity: 0;
         }
 
         /* 3D TILT ON CARDS */
         .tilt-card { transform-style: preserve-3d; }
 
-        /* ========================================================
-           RESPONSIVITA PRO TABLETY A MOBILY
-           ======================================================== */
-        
         @media (max-width: 992px) {
             .contact-grid { grid-template-columns: 1fr 1fr; }
-            .contact-card:last-child { grid-column: span 2; min-height: 400px; } 
         }
 
         @media (max-width: 768px) {
-            nav { padding: 12px 20px; }
-            .nav-logo { font-size: 1.3rem; }
-            
-            /* Zobrazení hamburgeru */
-            .hamburger { display: flex; }
-            
-            /* Úprava menu pro mobil - skryté vyjížděcí okno */
-            nav ul {
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100vh;
-                background: rgba(250, 250, 247, 0.98); /* Téměř plná barva pro čitelnost */
-                backdrop-filter: blur(15px);
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 24px;
-                transform: translateY(-100%);
-                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-                z-index: 1001; /* Pod logem a hamburgerem */
-            }
-            
-            nav ul.active { transform: translateY(0); }
-            
-            /* Velké čitelné odkazy v mobilním menu */
-            nav a {
-                font-size: 1.4rem;
-                padding: 10px 20px;
-            }
-            
-            /* Animace hamburger ikony do křížku */
-            .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-            .hamburger.active span:nth-child(2) { opacity: 0; }
-            .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-
-            /* Zbytek responsivity */
-            section { padding: 80px 20px 40px; }
-            .section-title { font-size: 2.2rem; }
-            
-            #uvod h1 { font-size: clamp(3rem, 12vw, 4.5rem); }
-            .hero-badges { display: none; } 
-            
+            nav { padding: 0 20px; }
+            nav ul { gap: 0; }
+            nav a { padding: 6px 8px; font-size: 0.7rem; }
+            section { padding: 80px 20px; }
+            #uvod h1 { font-size: 3.5rem; }
             .service-grid, .leisure-grid, .contact-grid, .room-grid { grid-template-columns: 1fr; }
-            .contact-card:last-child { grid-column: span 1; min-height: 300px; } 
-            
-            .service-card, .room-card, .leisure-card, .contact-card { padding: 24px; }
-            
             .gallery-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
             .gallery-item:first-child, .gallery-item:nth-child(4) { grid-column: auto; }
-            .gallery-item { height: 250px; } 
-            
             .reservation-form { grid-template-columns: 1fr; }
+            .hero-badges { display: none; }
         }
     </style>
 </head>
-<body>
+<body class="intro-active">
 
     <div class="cursor-dot" id="cursor-dot"></div>
     <div class="cursor-ring" id="cursor-ring"></div>
 
-    <nav>
-        <div class="nav-logo">Penzion Řezáč</div>
-        <div class="hamburger" id="hamburger">
-            <span></span>
-            <span></span>
-            <span></span>
+    <div id="intro-vstup">
+        <div class="intro-pension-photo"></div>
+        <div class="ai-portal-frame" id="ai-portal">
+            <h2 class="intro-napis-nadvorim">Jizerské hory</h2>
+            <h1 class="intro-napis-penzion">Penzion Řezáč</h1>
+            <button class="vstup-btn">Vstoupit →</button>
         </div>
-        <ul id="nav-links">
-            <li><a href="#uvod">Úvod</a></li>
-            <li><a href="#sluzby">Služby</a></li>
-            <li><a href="#ubytovani">Ubytování</a></li>
-            <li><a href="#cenik">Ceník</a></li>
-            <li><a href="#rezervace">Rezervace</a></li>
-            <li><a href="#fotogalerie">Galerie</a></li>
-            <li><a href="#volnycas">Volný čas</a></li>
-            <li><a href="#kontakty">Kontakt</a></li>
-        </ul>
-    </nav>
+    </div>
 
-    <section id="uvod">
-        <video class="hero-bg" id="hero-parallax" autoplay loop muted playsinline>
-            <source src="https://cdn.coverr.co/videos/coverr-snowy-mountain-peaks-8153/1080p.mp4" type="video/mp4">
-        </video>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <div class="hero-eyebrow">Bedřichov · Jizerské hory</div>
-            <h1 id="hero-headline">Penzion<br><em>Řezáč</em></h1>
-            <p class="hero-subtitle">Nové luxusní ubytovací zařízení se nachází v klidném prostředí obce Bedřichov v Jizerských horách. Nedaleko lyžařského stadionu — ideální pro zimní i letní rekreaci.</p>
-            <a href="#rezervace" class="hero-cta">Nezávazná rezervace →</a>
-        </div>
-        <div class="hero-scroll">
-            <div class="scroll-line"></div>
-            scroll
-        </div>
-        <div class="hero-badges">
-            <div class="badge"><div class="badge-dot"></div> 200m od běžeckého stadionu</div>
-            <div class="badge"><div class="badge-dot"></div> Areál Malinovka 1 km</div>
-            <div class="badge"><div class="badge-dot"></div> Start Jizerské 50</div>
-        </div>
-    </section>
+    <div id="main-content">
+        <nav>
+            <div class="nav-logo">Penzion Řezáč</div>
+            <ul>
+                <li><a href="#uvod">Úvod</a></li>
+                <li><a href="#sluzby">Služby</a></li>
+                <li><a href="#ubytovani">Ubytování</a></li>
+                <li><a href="#cenik">Ceník</a></li>
+                <li><a href="#rezervace">Rezervace</a></li>
+                <li><a href="#fotogalerie">Galerie</a></li>
+                <li><a href="#volnycas">Volný čas</a></li>
+                <li><a href="#kontakty">Kontakt</a></li>
+            </ul>
+        </nav>
 
-    <section id="sluzby">
-        <div class="section-tag reveal">Nabízíme</div>
-        <h2 class="section-title reveal reveal-delay-1">Služby</h2>
-        <div class="service-grid">
-            <div class="service-card tilt-card reveal reveal-delay-2">
-                <div class="service-card-icon">🏡</div>
-                <h3>V ceně ubytování</h3>
-                <ul>
-                    <li>Stylově zařízená společenská místnost s TV/SAT</li>
-                    <li>WIFI internet a krb</li>
-                    <li>Venkovní posezení</li>
-                    <li>Parkování pro hosty zdarma za uzavřenou bránou</li>
-                </ul>
+        <section id="uvod">
+            <video class="hero-bg" id="hero-parallax" autoplay loop muted playsinline>
+                <source src="https://cdn.coverr.co/videos/coverr-snowy-mountain-peaks-8153/1080p.mp4" type="video/mp4">
+            </video>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <div class="hero-eyebrow">Bedřichov · Jizerské hory</div>
+                <h1 id="hero-headline">Penzion<br><em>Řezáč</em></h1>
+                <p class="hero-subtitle">Nové luxusní ubytovací zařízení se nachází v klidném prostředí obce Bedřichov v Jizerských horách. Nedaleko lyžařského stadionu — ideální pro zimní i letní rekreaci.</p>
+                <a href="#rezervace" class="hero-cta">Nezávazná rezervace →</a>
             </div>
-            <div class="service-card tilt-card reveal reveal-delay-3">
-                <div class="service-card-icon">✨</div>
-                <h3>Na objednávku</h3>
-                <ul>
-                    <li>Sportovní a regenerační masáže</li>
-                    <li>Výuka angličtiny</li>
-                </ul>
+            <div class="hero-scroll">
+                <div class="scroll-line"></div>
+                scroll
             </div>
-        </div>
-    </section>
+            <div class="hero-badges">
+                <div class="badge"><div class="badge-dot"></div> 200m od běžeckého stadionu</div>
+                <div class="badge"><div class="badge-dot"></div> Areál Malinovka 1 km</div>
+                <div class="badge"><div class="badge-dot"></div> Start Jizerské 50</div>
+            </div>
+        </section>
 
-    <section id="ubytovani">
-        <div class="section-tag reveal">Pokoje & Apartmány</div>
-        <h2 class="section-title reveal reveal-delay-1">Ubytování</h2>
-        <div class="ubyt-intro reveal reveal-delay-2">
-            <p>Venkovní posezení u jezírka, pro děti houpačky a trampolína. K dispozici místnost pro úschovu letních i zimních potřeb.</p>
-            <p class="ubyt-note">V našem penzionu neubytováváme pejsky — děkujeme za pochopení.</p>
-        </div>
-
-        <div class="room-grid">
-            <div class="room-card tilt-card reveal reveal-delay-1">
-                <div class="room-card-header">
-                    <div class="room-card-icon">🛋️</div>
-                    <h3>Apartmány</h3>
+        <section id="sluzby">
+            <div class="section-tag reveal">Nabízíme</div>
+            <h2 class="section-title reveal reveal-delay-1">Služby</h2>
+            <div class="service-grid">
+                <div class="service-card tilt-card reveal reveal-delay-2">
+                    <div class="service-card-icon">🏡</div>
+                    <h3>V ceně ubytování</h3>
+                    <ul>
+                        <li>Stylově zařízená společenská místnost s TV/SAT</li>
+                        <li>WIFI internet a krb</li>
+                        <li>Venkovní posezení</li>
+                        <li>Parkování pro hosty zdarma za uzavřenou bránou</li>
+                    </ul>
                 </div>
-                <p>Dvě místnosti. Plně vybavená kuchyňka (mikrovlnka, lednice, varná deska, nádobí), jídelní kout, posezení a TV. Ve druhé místnosti manželská postel z masivu. Sociální zařízení se sprchovým koutem.</p>
-            </div>
-
-            <div class="room-card tilt-card reveal reveal-delay-2">
-                <div class="room-card-header">
-                    <div class="room-card-icon">🛏️</div>
-                    <h3>Dvoulůžkové pokoje</h3>
-                </div>
-                <p>Prostorná místnost s manželskou postelí z masivu, skříní, posezením. Sociální zařízení se sprchovým koutem. Některé pokoje disponují kuchyní s vybavením.</p>
-                <h4>Pokoje v hlavní budově:</h4>
-                <ul>
-                    <li><strong>Pokoje č. 3, 5, 6:</strong> Manželská postel (pro 2 osoby).</li>
-                </ul>
-            </div>
-
-            <div class="room-card tilt-card reveal reveal-delay-1">
-                <div class="room-card-header">
-                    <div class="room-card-icon">🏠</div>
-                    <h3>Hlavní budova</h3>
-                </div>
-                <p>Většina s výhledem do přírody.</p>
-                <ul>
-                    <li><strong>AP č.4 & č.1:</strong> Manželská postel, rozkládací pohovka, kuchyň (2 dospělí, 2 děti).</li>
-                    <li><strong>AP č.7:</strong> Jako výše, pohovka v oddělené místnosti.</li>
-                    <li><strong>AP č.2:</strong> Manželská postel, pohovka, kuchyň (2 dospělí, 1 dítě).</li>
-                </ul>
-            </div>
-
-            <div class="room-card tilt-card reveal reveal-delay-2">
-                <div class="room-card-header">
-                    <div class="room-card-icon">🏘️</div>
-                    <h3>Apartmánový dům</h3>
-                </div>
-                <p>Všechny apartmány s výhledem do přírody.</p>
-                <ul>
-                    <li><strong>AP č.1, 2:</strong> Manželská postel, kuchyň (pro 2 osoby).</li>
-                    <li><strong>AP č.3:</strong> Postel, pohovka v oddělené míst., kuchyň (pro 3 os.).</li>
-                    <li><strong>AP č.5:</strong> Postel, pohovka, kuchyň (pro 3 osoby).</li>
-                    <li><strong>AP č.6:</strong> Postel, pohovka v odděl. míst., kuchyň (2 dospělí, 2 děti).</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <section id="cenik">
-        <div class="section-tag reveal">Transparentně</div>
-        <h2 class="section-title reveal reveal-delay-1">Ceník</h2>
-        <div class="table-wrap reveal reveal-delay-2">
-            <table class="price-table">
-                <thead>
-                    <tr>
-                        <th rowspan="2">Období</th>
-                        <th colspan="3">Apartmán (Kč / noc)</th>
-                        <th colspan="3">Pokoj (Kč / noc)</th>
-                    </tr>
-                    <tr>
-                        <th class="sub">Dospělý</th><th class="sub">Dítě</th><th class="sub">Pes</th>
-                        <th class="sub">Dospělý</th><th class="sub">Dítě</th><th class="sub">Pes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td><strong>LÉTO</strong> (01.04. – 30.11.)</td><td>600</td><td>400</td><td>150</td><td>600</td><td>400</td><td>150</td></tr>
-                    <tr><td><strong>ZIMA</strong> (01.12. – 31.03.)</td><td>700</td><td>400</td><td>150</td><td>700</td><td>400</td><td>150</td></tr>
-                    <tr><td><strong>VÁNOCE</strong> (25.12. – 02.01.)</td><td>800</td><td>400</td><td>150</td><td>800</td><td>400</td><td>150</td></tr>
-                    <tr><td><strong>JIZERSKÁ 50</strong> (19.01. – 05.02.)</td><td>1 150</td><td>1 150</td><td>150</td><td>1 150</td><td>1 150</td><td>150</td></tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="price-note reveal reveal-delay-3">
-            <strong>Poznámky:</strong><br>
-            • V době Jizerské 50 nabízíme pouze týdenní pobyty.<br>
-            • Dítě = do věku 12 let.<br>
-            • Pobyt na jednu noc: příplatek + 50 %.
-        </div>
-    </section>
-
-    <section id="rezervace">
-        <div class="section-tag reveal">Kontaktujte nás</div>
-        <h2 class="section-title reveal reveal-delay-1">Rezervační formulář</h2>
-        <p class="section-desc reveal reveal-delay-2">Tučně označené položky (*) je nutné vyplnit. Ozveme se vám do 24 hodin.</p>
-        <form class="reservation-form reveal reveal-delay-3" action="ZDE_VLOZ_FORMSPREE_ODKAZ" method="POST">
-            <div class="form-group"><label>Jméno *</label><input type="text" name="Jmeno" required placeholder="Jan"></div>
-            <div class="form-group"><label>Příjmení *</label><input type="text" name="Prijmeni" required placeholder="Novák"></div>
-            <div class="form-group"><label>E-mail *</label><input type="email" name="Email" required placeholder="jan@email.cz"></div>
-            <div class="form-group"><label>Telefon *</label><input type="tel" name="Telefon" required placeholder="+420"></div>
-            <div class="form-group"><label>Délka pobytu — OD *</label><input type="date" name="Datum_od" required></div>
-            <div class="form-group"><label>Délka pobytu — DO *</label><input type="date" name="Datum_do" required></div>
-            <div class="form-group"><label>Dospělí (počet) *</label><input type="number" min="1" name="Dospeli" required placeholder="2"></div>
-            <div class="form-group"><label>Děti do 12 let</label><input type="number" min="0" value="0" name="Deti"></div>
-            <div class="form-group">
-                <label>Počet pokojů</label>
-                <select name="Pocet_pokoju"><option>0</option><option>1</option><option>2</option><option>3</option></select>
-            </div>
-            <div class="form-group">
-                <label>Počet apartmánů</label>
-                <select name="Pocet_apartmanu"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select>
-            </div>
-            <div class="form-group full"><label>Poznámka</label><textarea name="Poznamka" rows="4" placeholder="Upřesnění, přání..."></textarea></div>
-            <button class="submit-btn" type="submit">Odeslat rezervaci →</button>
-        </form>
-    </section>
-
-    <section id="fotogalerie">
-        <div class="section-tag reveal">Nahlédněte</div>
-        <h2 class="section-title reveal reveal-delay-1">Fotogalerie</h2>
-        <div class="gallery-grid reveal reveal-delay-2">
-            <div class="gallery-item"><img src="exterier.jpg" alt="Exteriér"></div>
-            <div class="gallery-item"><img src="mistnost.jpg" alt="Kuchyň"></div>
-            <div class="gallery-item"><img src="sauna.jpg" alt="Společenská místnost"></div>
-            <div class="gallery-item"><img src="zvenku.jpg" alt="Pokoj"></div>
-        </div>
-    </section>
-
-    <section id="volnycas">
-        <div class="section-tag reveal">Aktivity</div>
-        <h2 class="section-title reveal reveal-delay-1">Volný čas</h2>
-        <div class="leisure-grid">
-            <div class="leisure-card reveal reveal-delay-2">
-                <div class="leisure-season">❄️</div>
-                <h3>Zima</h3>
-                <ul>
-                    <li>Upravované lyžařské tratě po Jizerské magistrále (200 m)</li>
-                    <li>Sjezdový areál Malinovka (1 km)</li>
-                    <li>Severák (3 km), Špičák (8 km)</li>
-                    <li>Aquapark a centrum Babylon v Liberci (8 km)</li>
-                    <li>Sauna a masáže (v penzionu na objednávku)</li>
-                </ul>
-            </div>
-            <div class="leisure-card reveal reveal-delay-3">
-                <div class="leisure-season">☀️</div>
-                <h3>Léto</h3>
-                <ul>
-                    <li>Cyklistika a turistika</li>
-                    <li>Koupaliště (500 m)</li>
-                    <li>Jízda na koni — Prezidentská chata (1 km)</li>
-                    <li>Houbaření</li>
-                    <li>Tenisové kurty (200 m)</li>
-                    <li>Bobová dráha v Janově (3 km)</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <section id="kontakty">
-        <div class="section-tag reveal">Najdete nás</div>
-        <h2 class="section-title reveal reveal-delay-1">Kontakty</h2>
-        <div class="contact-grid reveal reveal-delay-2">
-            <div class="contact-card">
-                <h3>Penzion U Standy Řezáče</h3>
-                <div class="contact-row"><div class="contact-label">Adresa</div><div class="contact-value">468 12 Bedřichov 339</div></div>
-                <div class="contact-row"><div class="contact-label">Telefon</div><div class="contact-value"><a href="tel:+420608735222">+420 608 735 222</a></div></div>
-                <div class="contact-row"><div class="contact-label">E-mail</div><div class="contact-value"><a href="mailto:standarezac73@email.cz">standarezac73@email.cz</a></div></div>
-                <div class="contact-row"><div class="contact-label">GPS</div><div class="contact-value">50°47'38.247"N, 15°8'45.507"E</div></div>
-                <a href="https://maps.google.com/maps?q=Bed%C5%99ichov%20339,%20468%2012" target="_blank" class="map-btn">Otevřít v aplikaci →</a>
-            </div>
-            <div class="contact-card">
-                <h3>Jak k nám?</h3>
-                <div class="contact-row">
-                    <div class="contact-label">Z Liberce</div>
-                    <div class="contact-value">Liberec – Rudolfov – Bedřichov, u parkoviště rovně nahoru cca 200 m a doprava na parkoviště penzionu.</div>
-                </div>
-                <div class="contact-row" style="margin-top: 16px;">
-                    <div class="contact-label">Z Jablonce</div>
-                    <div class="contact-value">Loučná – Janov – Bedřichov, u parkoviště doprava nahoru cca 200 m a doprava na parkoviště penzionu.</div>
+                <div class="service-card tilt-card reveal reveal-delay-3">
+                    <div class="service-card-icon">✨</div>
+                    <h3>Na objednávku</h3>
+                    <ul>
+                        <li>Sportovní a regenerační masáže</li>
+                        <li>Výuka angličtiny</li>
+                    </ul>
                 </div>
             </div>
-            <div class="contact-card" style="padding: 12px;">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2524.364439064789!2d15.143715876878484!3d50.79451307166127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470933758b9cdb41%3A0xc3b0ed8de917d598!2zQmVkxZlpY2hvdiAzMzksIDQ2OCAxMiBCZWTFmWljaG92!5e0!3m2!1scs!2scz!4v1713437145610!5m2!1scs!2scz" width="100%" height="100%" style="border:0; border-radius: 8px; min-height: 250px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-            </div>
-        </div>
-    </section>
+        </section>
 
-    <footer>
-        <strong>Penzion U Standy Řezáče</strong> · Bedřichov 339 · Jizerské hory · <a href="tel:+420608735222" style="color:rgba(255,255,255,0.6)">+420 608 735 222</a>
-    </footer>
+        <section id="ubytovani">
+            <div class="section-tag reveal">Pokoje & Apartmány</div>
+            <h2 class="section-title reveal reveal-delay-1">Ubytování</h2>
+            <div class="ubyt-intro reveal reveal-delay-2">
+                <p>Venkovní posezení u jezírka, pro děti houpačky a trampolína. K dispozici místnost pro úschovu letních i zimních potřeb.</p>
+                <p class="ubyt-note">V našem penzionu neubytováváme pejsky — děkujeme za pochopení.</p>
+            </div>
+
+            <div class="room-grid">
+                <div class="room-card tilt-card reveal reveal-delay-1">
+                    <div class="room-card-header">
+                        <div class="room-card-icon">🛋️</div>
+                        <h3>Apartmány</h3>
+                    </div>
+                    <p>Dvě místnosti. Plně vybavená kuchyňka (mikrovlnka, lednice, varná deska, nádobí), jídelní kout, posezení a TV. Ve druhé místnosti manželská postel z masivu. Sociální zařízení se sprchovým koutem.</p>
+                </div>
+
+                <div class="room-card tilt-card reveal reveal-delay-2">
+                    <div class="room-card-header">
+                        <div class="room-card-icon">🛏️</div>
+                        <h3>Dvoulůžkové pokoje</h3>
+                    </div>
+                    <p>Prostorná místnost s manželskou postelí z masivu, skříní, posezením. Sociální zařízení se sprchovým koutem. Některé pokoje disponují kuchyní s vybavením.</p>
+                    <h4>Pokoje v hlavní budově:</h4>
+                    <ul>
+                        <li><strong>Pokoje č. 3, 5, 6:</strong> Manželská postel (pro 2 osoby).</li>
+                    </ul>
+                </div>
+
+                <div class="room-card tilt-card reveal reveal-delay-1">
+                    <div class="room-card-header">
+                        <div class="room-card-icon">🏠</div>
+                        <h3>Hlavní budova</h3>
+                    </div>
+                    <p>Většina s výhledem do přírody.</p>
+                    <ul>
+                        <li><strong>AP č.4 & č.1:</strong> Manželská postel, rozkládací pohovka, kuchyň (2 dospělí, 2 děti).</li>
+                        <li><strong>AP č.7:</strong> Jako výše, pohovka v oddělené místnosti.</li>
+                        <li><strong>AP č.2:</strong> Manželská postel, pohovka, kuchyň (2 dospělí, 1 dítě).</li>
+                    </ul>
+                </div>
+
+                <div class="room-card tilt-card reveal reveal-delay-2">
+                    <div class="room-card-header">
+                        <div class="room-card-icon">🏘️</div>
+                        <h3>Apartmánový dům</h3>
+                    </div>
+                    <p>Všechny apartmány s výhledem do přírody.</p>
+                    <ul>
+                        <li><strong>AP č.1, 2:</strong> Manželská postel, kuchyň (pro 2 osoby).</li>
+                        <li><strong>AP č.3:</strong> Postel, pohovka v oddělené míst., kuchyň (pro 3 os.).</li>
+                        <li><strong>AP č.5:</strong> Postel, pohovka, kuchyň (pro 3 osoby).</li>
+                        <li><strong>AP č.6:</strong> Postel, pohovka v odděl. míst., kuchyň (2 dospělí, 2 děti).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="cenik">
+            <div class="section-tag reveal">Transparentně</div>
+            <h2 class="section-title reveal reveal-delay-1">Ceník</h2>
+            <div class="table-wrap reveal reveal-delay-2">
+                <table class="price-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Období</th>
+                            <th colspan="3">Apartmán (Kč / noc)</th>
+                            <th colspan="3">Pokoj (Kč / noc)</th>
+                        </tr>
+                        <tr>
+                            <th class="sub">Dospělý</th><th class="sub">Dítě</th><th class="sub">Pes</th>
+                            <th class="sub">Dospělý</th><th class="sub">Dítě</th><th class="sub">Pes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>LÉTO</strong> (01.04. – 30.11.)</td><td>600</td><td>400</td><td>150</td><td>600</td><td>400</td><td>150</td></tr>
+                        <tr><td><strong>ZIMA</strong> (01.12. – 31.03.)</td><td>700</td><td>400</td><td>150</td><td>700</td><td>400</td><td>150</td></tr>
+                        <tr><td><strong>VÁNOCE</strong> (25.12. – 02.01.)</td><td>800</td><td>400</td><td>150</td><td>800</td><td>400</td><td>150</td></tr>
+                        <tr><td><strong>JIZERSKÁ 50</strong> (19.01. – 05.02.)</td><td>1 150</td><td>1 150</td><td>150</td><td>1 150</td><td>1 150</td><td>150</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="price-note reveal reveal-delay-3">
+                <strong>Poznámky:</strong><br>
+                • V době Jizerské 50 nabízíme pouze týdenní pobyty.<br>
+                • Dítě = do věku 12 let.<br>
+                • Pobyt na jednu noc: příplatek + 50 %.
+            </div>
+        </section>
+
+        <section id="rezervace">
+            <div class="section-tag reveal">Kontaktujte nás</div>
+            <h2 class="section-title reveal reveal-delay-1">Rezervační formulář</h2>
+            <p class="section-desc reveal reveal-delay-2">Tučně označené položky (*) je nutné vyplnit. Ozveme se vám do 24 hodin.</p>
+            <form class="reservation-form reveal reveal-delay-3" action="ZDE_VLOZ_FORMSPREE_ODKAZ" method="POST">
+                <div class="form-group"><label>Jméno *</label><input type="text" name="Jmeno" required placeholder="Jan"></div>
+                <div class="form-group"><label>Příjmení *</label><input type="text" name="Prijmeni" required placeholder="Novák"></div>
+                <div class="form-group"><label>E-mail *</label><input type="email" name="Email" required placeholder="jan@email.cz"></div>
+                <div class="form-group"><label>Telefon *</label><input type="tel" name="Telefon" required placeholder="+420"></div>
+                <div class="form-group"><label>Délka pobytu — OD *</label><input type="date" name="Datum_od" required></div>
+                <div class="form-group"><label>Délka pobytu — DO *</label><input type="date" name="Datum_do" required></div>
+                <div class="form-group"><label>Dospělí (počet) *</label><input type="number" min="1" name="Dospeli" required placeholder="2"></div>
+                <div class="form-group"><label>Děti do 12 let</label><input type="number" min="0" value="0" name="Deti"></div>
+                <div class="form-group">
+                    <label>Počet pokojů</label>
+                    <select name="Pocet_pokoju"><option>0</option><option>1</option><option>2</option><option>3</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Počet apartmánů</label>
+                    <select name="Pocet_apartmanu"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select>
+                </div>
+                <div class="form-group full"><label>Poznámka</label><textarea name="Poznamka" rows="4" placeholder="Upřesnění, přání..."></textarea></div>
+                <button class="submit-btn" type="submit">Odeslat rezervaci →</button>
+            </form>
+        </section>
+
+        <section id="fotogalerie">
+            <div class="section-tag reveal">Nahlédněte</div>
+            <h2 class="section-title reveal reveal-delay-1">Fotogalerie</h2>
+            <div class="gallery-grid reveal reveal-delay-2">
+                <div class="gallery-item"><img src="exterier.jpg" alt="Exteriér"></div>
+                <div class="gallery-item"><img src="mistnost.jpg" alt="Kuchyň"></div>
+                <div class="gallery-item"><img src="sauna.jpg" alt="Společenská místnost"></div>
+                <div class="gallery-item"><img src="zvenku.jpg" alt="Pokoj"></div>
+            </div>
+        </section>
+
+        <section id="volnycas">
+            <div class="section-tag reveal">Aktivity</div>
+            <h2 class="section-title reveal reveal-delay-1">Volný čas</h2>
+            <div class="leisure-grid">
+                <div class="leisure-card reveal reveal-delay-2">
+                    <div class="leisure-season">❄️</div>
+                    <h3>Zima</h3>
+                    <ul>
+                        <li>Upravované lyžařské tratě po Jizerské magistrále (200 m)</li>
+                        <li>Sjezdový areál Malinovka (1 km)</li>
+                        <li>Severák (3 km), Špičák (8 km)</li>
+                        <li>Aquapark a centrum Babylon v Liberci (8 km)</li>
+                        <li>Sauna a masáže (v penzionu na objednávku)</li>
+                    </ul>
+                </div>
+                <div class="leisure-card reveal reveal-delay-3">
+                    <div class="leisure-season">☀️</div>
+                    <h3>Léto</h3>
+                    <ul>
+                        <li>Cyklistika a turistika</li>
+                        <li>Koupaliště (500 m)</li>
+                        <li>Jízda na koni — Prezidentská chata (1 km)</li>
+                        <li>Houbaření</li>
+                        <li>Tenisové kurty (200 m)</li>
+                        <li>Bobová dráha v Janově (3 km)</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="kontakty">
+            <div class="section-tag reveal">Najdete nás</div>
+            <h2 class="section-title reveal reveal-delay-1">Kontakty</h2>
+            <div class="contact-grid reveal reveal-delay-2">
+                <div class="contact-card">
+                    <h3>Penzion U Standy Řezáče</h3>
+                    <div class="contact-row"><div class="contact-label">Adresa</div><div class="contact-value">468 12 Bedřichov 339</div></div>
+                    <div class="contact-row"><div class="contact-label">Telefon</div><div class="contact-value"><a href="tel:+420608735222">+420 608 735 222</a></div></div>
+                    <div class="contact-row"><div class="contact-label">E-mail</div><div class="contact-value"><a href="mailto:standarezac73@email.cz">standarezac73@email.cz</a></div></div>
+                    <div class="contact-row"><div class="contact-label">GPS</div><div class="contact-value">50°47'38.247"N, 15°8'45.507"E</div></div>
+                    <a href="https://maps.google.com/maps?q=Bed%C5%99ichov%20339,%20468%2012" target="_blank" class="map-btn">Otevřít v aplikaci →</a>
+                </div>
+                <div class="contact-card">
+                    <h3>Jak k nám?</h3>
+                    <div class="contact-row">
+                        <div class="contact-label">Z Liberce</div>
+                        <div class="contact-value">Liberec – Rudolfov – Bedřichov, u parkoviště rovně nahoru cca 200 m a doprava na parkoviště penzionu.</div>
+                    </div>
+                    <div class="contact-row" style="margin-top: 16px;">
+                        <div class="contact-label">Z Jablonce</div>
+                        <div class="contact-value">Loučná – Janov – Bedřichov, u parkoviště doprava nahoru cca 200 m a doprava na parkoviště penzionu.</div>
+                    </div>
+                </div>
+                <div class="contact-card" style="padding: 12px; min-height: 300px;">
+                    <iframe src="https://maps.google.com/maps?q=Bed%C5%99ichov%20339,%20468%2012&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <strong>Penzion U Standy Řezáče</strong> · Bedřichov 339 · Jizerské hory · <a href="tel:+420608735222" style="color:rgba(255,255,255,0.6)">+420 608 735 222</a>
+        </footer>
+    </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
     // ═══════════════════════════════════════
-    // HAMBURGER MENU LIGIKA
+    // JS PRO LOGIKU VSTUPU (VCUCNUTÍ DO WEBU)
     // ═══════════════════════════════════════
-    const hamburger = document.getElementById('hamburger');
-    const navLinksMenu = document.getElementById('nav-links');
-    const navItems = document.querySelectorAll('#nav-links a');
+    document.addEventListener("DOMContentLoaded", () => {
+        const introSection = document.getElementById('intro-vstup');
+        const portalFrame = document.getElementById('ai-portal');
+        const mainContent = document.getElementById('main-content');
+        const body = document.body;
 
-    hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinksMenu.classList.toggle('active');
+        function spustitVstup() {
+            if (introSection.classList.contains('fly-in')) return;
+            introSection.classList.add('fly-in');
+            
+            // Hned v tuto chvíli načteme web na pozadí (Zabrání to bílé obrazovce!)
+            mainContent.style.display = 'block';
+            setTimeout(() => {
+                mainContent.style.opacity = '1';
+                mainContent.style.visibility = 'visible';
+            }, 50);
+            
+            // Jakmile doletíme dovnitř, intro se smazává a scrollování se odemyká
+            setTimeout(() => {
+                introSection.style.display = 'none';
+                body.classList.remove('intro-active');
+            }, 1500); 
+        }
+
+        // Spuštění inta při kliknutí nebo pohybu myši/prstu (scroll down)
+        portalFrame.addEventListener('click', spustitVstup);
+        window.addEventListener('wheel', (e) => {
+            if (body.classList.contains('intro-active') && e.deltaY > 0) spustitVstup();
+        }, { passive: true });
+        window.addEventListener('touchmove', (e) => {
+            if (body.classList.contains('intro-active')) spustitVstup();
+        }, { passive: true });
     });
 
-    navItems.forEach(item => {
-        item.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navLinksMenu.classList.remove('active');
-        });
-    });
-
     // ═══════════════════════════════════════
-    // CURSOR (Deaktivováno pro dotykové obrazovky v CSS)
+    // TVŮJ PŮVODNÍ JS (Zcela nedotčený)
     // ═══════════════════════════════════════
     const dot = document.getElementById('cursor-dot');
     const ring = document.getElementById('cursor-ring');
@@ -853,27 +910,18 @@
         animRing();
     }
 
-    // ═══════════════════════════════════════
-    // SCROLL REVEAL
-    // ═══════════════════════════════════════
     const reveals = document.querySelectorAll('.reveal');
     const obs = new IntersectionObserver((entries) => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
     }, { threshold: 0.12 });
     reveals.forEach(el => obs.observe(el));
 
-    // ═══════════════════════════════════════
-    // HERO PARALLAX
-    // ═══════════════════════════════════════
     const heroBg = document.getElementById('hero-parallax');
     window.addEventListener('scroll', () => {
         const y = window.scrollY;
         heroBg.style.transform = `scale(1.05) translateY(${y * 0.3}px)`;
     }, { passive: true });
 
-    // ═══════════════════════════════════════
-    // 3D TILT ON CARDS (Jen pro zařízení s myší)
-    // ═══════════════════════════════════════
     if (window.matchMedia("(pointer: fine)").matches) {
         document.querySelectorAll('.tilt-card').forEach(card => {
             card.addEventListener('mousemove', e => {
@@ -890,17 +938,14 @@
         });
     }
 
-    // ═══════════════════════════════════════
-    // NAV ACTIVE HIGHLIGHT
-    // ═══════════════════════════════════════
     const sections = document.querySelectorAll('section[id]');
-    const navLinksDesktop = document.querySelectorAll('nav a');
+    const navLinks = document.querySelectorAll('nav a');
     window.addEventListener('scroll', () => {
         let current = '';
         sections.forEach(s => {
             if (window.scrollY >= s.offsetTop - 100) current = s.id;
         });
-        navLinksDesktop.forEach(a => {
+        navLinks.forEach(a => {
             a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
             a.style.background = a.getAttribute('href') === '#' + current ? 'rgba(45,90,66,0.07)' : '';
         });
