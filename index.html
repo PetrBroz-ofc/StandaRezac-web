@@ -57,8 +57,11 @@
             color: var(--green);
             letter-spacing: 1px;
             white-space: nowrap;
+            position: relative;
+            z-index: 1002; /* Aby logo bylo nad mobilním menu */
         }
-        nav ul { display: flex; list-style: none; gap: 4px; flex-wrap: wrap; }
+        
+        nav ul { display: flex; list-style: none; gap: 4px; }
         nav a {
             text-decoration: none; color: var(--text-mid);
             font-size: 0.78rem; font-weight: 500; padding: 8px 12px;
@@ -66,6 +69,22 @@
             border-radius: 6px; transition: all 0.25s;
         }
         nav a:hover { color: var(--green); background: rgba(45,90,66,0.07); }
+
+        /* HAMBURGER MENU IKONA */
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1002; /* Aby byl křížek vždy klikatelný */
+            padding: 10px 0;
+        }
+        .hamburger span {
+            width: 25px;
+            height: 2px;
+            background-color: var(--green);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
 
         /* HERO */
         #uvod {
@@ -244,7 +263,7 @@
             width: 6px; height: 1px; background: var(--wood);
         }
 
-        /* UBYTOVANI - STATICKÝ GRID MÍSTO FYZIKY */
+        /* UBYTOVANI */
         #ubytovani {
             background: #fff;
         }
@@ -293,8 +312,8 @@
 
         /* CENIK */
         #cenik { background: var(--bg); }
-        .table-wrap { width: 100%; max-width: 1000px; overflow-x: auto; border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); }
-        .price-table { width: 100%; border-collapse: collapse; background: #fff; }
+        .table-wrap { width: 100%; max-width: 1000px; overflow-x: auto; border-radius: 16px; box-shadow: 0 4px 24px var(--shadow); -webkit-overflow-scrolling: touch; }
+        .price-table { width: 100%; border-collapse: collapse; background: #fff; min-width: 600px; }
         .price-table th, .price-table td { padding: 16px 20px; border: 1px solid var(--border); font-size: 0.9rem; }
         .price-table thead th { background: var(--green); color: #fff; font-weight: 500; letter-spacing: 0.5px; }
         .price-table thead th.sub { background: rgba(45,90,66,0.08); color: var(--green); font-weight: 600; font-size: 0.8rem; }
@@ -406,7 +425,7 @@
         }
         .leisure-card li::before { content: '→'; position: absolute; left: 0; color: var(--wood); font-size: 0.8rem; }
 
-        /* KONTAKTY (ZDE PROBĚHLA ÚPRAVA NA 3 SLOUPCE) */
+        /* KONTAKTY */
         #kontakty { background: #fff; }
         .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1200px; width: 100%; }
         .contact-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 40px; display: flex; flex-direction: column; }
@@ -439,41 +458,95 @@
         footer strong { color: #fff; }
 
         /* CURSOR TRAIL */
-        .cursor-dot {
-            position: fixed; width: 8px; height: 8px;
-            background: var(--green); border-radius: 50%;
-            pointer-events: none; z-index: 9999;
-            transform: translate(-50%, -50%);
-            transition: transform 0.1s, opacity 0.3s;
-            opacity: 0;
+        @media (pointer: fine) {
+            .cursor-dot {
+                position: fixed; width: 8px; height: 8px;
+                background: var(--green); border-radius: 50%;
+                pointer-events: none; z-index: 9999;
+                transform: translate(-50%, -50%);
+                transition: transform 0.1s, opacity 0.3s;
+                opacity: 0;
+            }
+            .cursor-ring {
+                position: fixed; width: 32px; height: 32px;
+                border: 1px solid rgba(45,90,66,0.4); border-radius: 50%;
+                pointer-events: none; z-index: 9998;
+                transform: translate(-50%, -50%);
+                transition: transform 0.15s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
+                opacity: 0;
+            }
         }
-        .cursor-ring {
-            position: fixed; width: 32px; height: 32px;
-            border: 1px solid rgba(45,90,66,0.4); border-radius: 50%;
-            pointer-events: none; z-index: 9998;
-            transform: translate(-50%, -50%);
-            transition: transform 0.15s cubic-bezier(0.16,1,0.3,1), opacity 0.3s;
-            opacity: 0;
+        @media (pointer: coarse) {
+            .cursor-dot, .cursor-ring { display: none !important; }
         }
 
         /* 3D TILT ON CARDS */
         .tilt-card { transform-style: preserve-3d; }
 
+        /* ========================================================
+           RESPONSIVITA PRO TABLETY A MOBILY
+           ======================================================== */
+        
         @media (max-width: 992px) {
             .contact-grid { grid-template-columns: 1fr 1fr; }
+            .contact-card:last-child { grid-column: span 2; min-height: 400px; } 
         }
 
         @media (max-width: 768px) {
-            nav { padding: 0 20px; }
-            nav ul { gap: 0; }
-            nav a { padding: 6px 8px; font-size: 0.7rem; }
-            section { padding: 80px 20px; }
-            #uvod h1 { font-size: 3.5rem; }
+            nav { padding: 12px 20px; }
+            .nav-logo { font-size: 1.3rem; }
+            
+            /* Zobrazení hamburgeru */
+            .hamburger { display: flex; }
+            
+            /* Úprava menu pro mobil - skryté vyjížděcí okno */
+            nav ul {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(250, 250, 247, 0.98); /* Téměř plná barva pro čitelnost */
+                backdrop-filter: blur(15px);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 24px;
+                transform: translateY(-100%);
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 1001; /* Pod logem a hamburgerem */
+            }
+            
+            nav ul.active { transform: translateY(0); }
+            
+            /* Velké čitelné odkazy v mobilním menu */
+            nav a {
+                font-size: 1.4rem;
+                padding: 10px 20px;
+            }
+            
+            /* Animace hamburger ikony do křížku */
+            .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+            .hamburger.active span:nth-child(2) { opacity: 0; }
+            .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+            /* Zbytek responsivity */
+            section { padding: 80px 20px 40px; }
+            .section-title { font-size: 2.2rem; }
+            
+            #uvod h1 { font-size: clamp(3rem, 12vw, 4.5rem); }
+            .hero-badges { display: none; } 
+            
             .service-grid, .leisure-grid, .contact-grid, .room-grid { grid-template-columns: 1fr; }
+            .contact-card:last-child { grid-column: span 1; min-height: 300px; } 
+            
+            .service-card, .room-card, .leisure-card, .contact-card { padding: 24px; }
+            
             .gallery-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
             .gallery-item:first-child, .gallery-item:nth-child(4) { grid-column: auto; }
+            .gallery-item { height: 250px; } 
+            
             .reservation-form { grid-template-columns: 1fr; }
-            .hero-badges { display: none; }
         }
     </style>
 </head>
@@ -484,7 +557,12 @@
 
     <nav>
         <div class="nav-logo">Penzion Řezáč</div>
-        <ul>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul id="nav-links">
             <li><a href="#uvod">Úvod</a></li>
             <li><a href="#sluzby">Služby</a></li>
             <li><a href="#ubytovani">Ubytování</a></li>
@@ -663,12 +741,12 @@
         <div class="section-tag reveal">Nahlédněte</div>
         <h2 class="section-title reveal reveal-delay-1">Fotogalerie</h2>
         <div class="gallery-grid reveal reveal-delay-2">
-            <div class="gallery-item"><img src="http://www.penzion-rezac.cz/photos/big/DSCN2882.jpg" alt="Exteriér"></div>
-            <div class="gallery-item"><img src="http://www.penzion-rezac.cz/photos/big/2MS_6768.jpg" alt="Kuchyň"></div>
-            <div class="gallery-item"><img src="http://www.penzion-rezac.cz/photos/big/100703095504.jpg" alt="Společenská místnost"></div>
-            <div class="gallery-item"><img src="http://www.penzion-rezac.cz/photos/big/2MS_6718.jpg" alt="Pokoj"></div>
-            <div class="gallery-item"><img src="http://www.penzion-rezac.cz/photos/big/image1.jpeg" alt="Detail pokoje"></div>
-            <div class="gallery-item"><img src="http://www.penzion-rezac.cz/photos/big/2MS_6750.jpg" alt="Příroda v okolí"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1542223616-94111ea3d51c?q=80&w=800&auto=format&fit=crop" alt="Exteriér"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=600&auto=format&fit=crop" alt="Kuchyň"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?q=80&w=600&auto=format&fit=crop" alt="Společenská místnost"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1596178066229-643413587d08?q=80&w=800&auto=format&fit=crop" alt="Pokoj"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?q=80&w=600&auto=format&fit=crop" alt="Detail pokoje"></div>
+            <div class="gallery-item"><img src="https://images.unsplash.com/photo-1510798831971-661eb04b3739?q=80&w=600&auto=format&fit=crop" alt="Příroda v okolí"></div>
         </div>
     </section>
 
@@ -725,8 +803,8 @@
                     <div class="contact-value">Loučná – Janov – Bedřichov, u parkoviště doprava nahoru cca 200 m a doprava na parkoviště penzionu.</div>
                 </div>
             </div>
-            <div class="contact-card" style="padding: 12px; min-height: 300px;">
-                <iframe src="https://maps.google.com/maps?q=Bed%C5%99ichov%20339,%20468%2012&t=&z=15&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" style="border:0; border-radius: 8px;" allowfullscreen="" loading="lazy"></iframe>
+            <div class="contact-card" style="padding: 12px;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2524.364439064789!2d15.143715876878484!3d50.79451307166127!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470933758b9cdb41%3A0xc3b0ed8de917d598!2zQmVkxZlpY2hvdiAzMzksIDQ2OCAxMiBCZWTFmWljaG92!5e0!3m2!1scs!2scz!4v1713437145610!5m2!1scs!2scz" width="100%" height="100%" style="border:0; border-radius: 8px; min-height: 250px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
             </div>
         </div>
     </section>
@@ -737,23 +815,45 @@
 
     <script>
     // ═══════════════════════════════════════
-    // CURSOR
+    // HAMBURGER MENU LIGIKA
+    // ═══════════════════════════════════════
+    const hamburger = document.getElementById('hamburger');
+    const navLinksMenu = document.getElementById('nav-links');
+    const navItems = document.querySelectorAll('#nav-links a');
+
+    hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinksMenu.classList.toggle('active');
+    });
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            navLinksMenu.classList.remove('active');
+        });
+    });
+
+    // ═══════════════════════════════════════
+    // CURSOR (Deaktivováno pro dotykové obrazovky v CSS)
     // ═══════════════════════════════════════
     const dot = document.getElementById('cursor-dot');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0;
-    document.addEventListener('mousemove', e => {
-        mx = e.clientX; my = e.clientY;
-        dot.style.left = mx + 'px'; dot.style.top = my + 'px';
-        dot.style.opacity = 1; ring.style.opacity = 1;
-    });
-    document.addEventListener('mouseleave', () => { dot.style.opacity = 0; ring.style.opacity = 0; });
-    function animRing() {
-        rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-        ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-        requestAnimationFrame(animRing);
+    
+    if (window.matchMedia("(pointer: fine)").matches) {
+        document.addEventListener('mousemove', e => {
+            mx = e.clientX; my = e.clientY;
+            dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+            dot.style.opacity = 1; ring.style.opacity = 1;
+        });
+        document.addEventListener('mouseleave', () => { dot.style.opacity = 0; ring.style.opacity = 0; });
+        function animRing() {
+            rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+            ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+            requestAnimationFrame(animRing);
+        }
+        animRing();
     }
-    animRing();
 
     // ═══════════════════════════════════════
     // SCROLL REVEAL
@@ -774,33 +874,35 @@
     }, { passive: true });
 
     // ═══════════════════════════════════════
-    // 3D TILT ON CARDS
+    // 3D TILT ON CARDS (Jen pro zařízení s myší)
     // ═══════════════════════════════════════
-    document.querySelectorAll('.tilt-card').forEach(card => {
-        card.addEventListener('mousemove', e => {
-            const r = card.getBoundingClientRect();
-            const x = (e.clientX - r.left) / r.width - 0.5;
-            const y = (e.clientY - r.top) / r.height - 0.5;
-            card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-6px)`;
-            card.style.boxShadow = `${-x * 20}px ${-y * 20}px 40px rgba(45,90,66,0.12)`;
+    if (window.matchMedia("(pointer: fine)").matches) {
+        document.querySelectorAll('.tilt-card').forEach(card => {
+            card.addEventListener('mousemove', e => {
+                const r = card.getBoundingClientRect();
+                const x = (e.clientX - r.left) / r.width - 0.5;
+                const y = (e.clientY - r.top) / r.height - 0.5;
+                card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-6px)`;
+                card.style.boxShadow = `${-x * 20}px ${-y * 20}px 40px rgba(45,90,66,0.12)`;
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            });
         });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-            card.style.boxShadow = '';
-        });
-    });
+    }
 
     // ═══════════════════════════════════════
     // NAV ACTIVE HIGHLIGHT
     // ═══════════════════════════════════════
     const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('nav a');
+    const navLinksDesktop = document.querySelectorAll('nav a');
     window.addEventListener('scroll', () => {
         let current = '';
         sections.forEach(s => {
             if (window.scrollY >= s.offsetTop - 100) current = s.id;
         });
-        navLinks.forEach(a => {
+        navLinksDesktop.forEach(a => {
             a.style.color = a.getAttribute('href') === '#' + current ? 'var(--green)' : '';
             a.style.background = a.getAttribute('href') === '#' + current ? 'rgba(45,90,66,0.07)' : '';
         });
