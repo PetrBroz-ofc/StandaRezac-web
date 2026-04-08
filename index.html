@@ -6,13 +6,13 @@
     <title>Penzion U Standy Řezáče | Jizerské hory</title>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* ══════════════════════════════════════════════
-           CSS PRO ÚVODNÍ ANIMACI (ČISTÁ FOTKA BEZ DVEŘÍ)
-           ══════════════════════════════════════════════ */
+        /* ==========================================
+           PŘIDÁNO: CSS PRO INTRO ANIMACI
+           ========================================== */
         body.intro-active {
             overflow: hidden;
             height: 100vh;
-            background-color: var(--bg); /* Stejná barva jako web, zamezí bliknutí */
+            background-color: var(--bg);
         }
 
         #main-content {
@@ -50,7 +50,6 @@
             z-index: 1;
         }
         
-        /* Lehké ztmavení jen na okrajích (viněta), aby text uprostřed vynikl, ale fotka zůstala krásná */
         #intro-vstup::after {
             content: '';
             position: absolute;
@@ -65,7 +64,7 @@
             z-index: 5;
             text-align: center;
             color: #fff;
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            display: flex; flex-direction: column; align-items: center; gap: 30px;
             transition: opacity 0.8s ease, transform 1.5s cubic-bezier(0.16,1,0.3,1);
             cursor: pointer;
         }
@@ -98,20 +97,18 @@
         }
         .vstup-btn:hover { background: #fff; color: var(--green); border-color: #fff; }
 
-        /* TŘÍDA PRO VCUCNUTÍ (PŘIBLÍŽENÍ OBRÁZKU) */
         #intro-vstup.fly-in .intro-pension-photo {
-            transform: scale(20) translateZ(300px); /* Přiblížení */
-            opacity: 0; /* Plynule se rozplyne do webu */
+            transform: scale(20) translateZ(300px);
+            opacity: 0; 
         }
         #intro-vstup.fly-in .ai-portal-frame {
             opacity: 0;
-            transform: scale(1.5) translateZ(100px); /* Text proletí směrem k nám */
+            transform: scale(1.5) translateZ(100px);
         }
+        /* ==========================================
+           KONEC PŘIDANÉHO CSS - NÍŽE JE TVŮJ PŮVODNÍ KÓD
+           ========================================== */
 
-
-        /* ══════════════════════════════════════════════
-           TVŮJ PŮVODNÍ KÓD BEZE ZMĚN
-           ══════════════════════════════════════════════ */
         :root {
             --bg: #FAFAF7;
             --green: #2D5A42;
@@ -512,7 +509,7 @@
         }
         .leisure-card li::before { content: '→'; position: absolute; left: 0; color: var(--wood); font-size: 0.8rem; }
 
-        /* KONTAKTY */
+        /* KONTAKTY (ZDE PROBĚHLA ÚPRAVA NA 3 SLOUPCE) */
         #kontakty { background: #fff; }
         .contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1200px; width: 100%; }
         .contact-card { background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 40px; display: flex; flex-direction: column; }
@@ -848,12 +845,14 @@
         <footer>
             <strong>Penzion U Standy Řezáče</strong> · Bedřichov 339 · Jizerské hory · <a href="tel:+420608735222" style="color:rgba(255,255,255,0.6)">+420 608 735 222</a>
         </footer>
-    </div> <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
     <script>
-    // ═══════════════════════════════════════
-    // JS PRO LOGIKU VSTUPU (VCUCNUTÍ DO WEBU)
-    // ═══════════════════════════════════════
+    // ==========================================
+    // PŘIDÁNO: JS PRO LOGIKU VSTUPU (VCUCNUTÍ)
+    // ==========================================
     document.addEventListener("DOMContentLoaded", () => {
         const introSection = document.getElementById('intro-vstup');
         const portalFrame = document.getElementById('ai-portal');
@@ -864,21 +863,18 @@
             if (introSection.classList.contains('fly-in')) return;
             introSection.classList.add('fly-in');
             
-            // Hned v tuto chvíli načteme web na pozadí (Zabrání to bílé obrazovce!)
             mainContent.style.display = 'block';
             setTimeout(() => {
                 mainContent.style.opacity = '1';
                 mainContent.style.visibility = 'visible';
             }, 50);
             
-            // Jakmile doletíme dovnitř, intro se smazává a scrollování se odemyká
             setTimeout(() => {
                 introSection.style.display = 'none';
                 body.classList.remove('intro-active');
             }, 1500); 
         }
 
-        // Spuštění inta při kliknutí nebo pohybu myši/prstu (scroll down)
         portalFrame.addEventListener('click', spustitVstup);
         window.addEventListener('wheel', (e) => {
             if (body.classList.contains('intro-active') && e.deltaY > 0) spustitVstup();
@@ -888,27 +884,24 @@
         }, { passive: true });
     });
 
-    // ═══════════════════════════════════════
-    // TVŮJ PŮVODNÍ JS (Zcela nedotčený)
-    // ═══════════════════════════════════════
+    // ==========================================
+    // NÍŽE JE TVŮJ PŮVODNÍ JS BEZE ZMĚN
+    // ==========================================
     const dot = document.getElementById('cursor-dot');
     const ring = document.getElementById('cursor-ring');
     let mx = 0, my = 0, rx = 0, ry = 0;
-    
-    if (window.matchMedia("(pointer: fine)").matches) {
-        document.addEventListener('mousemove', e => {
-            mx = e.clientX; my = e.clientY;
-            dot.style.left = mx + 'px'; dot.style.top = my + 'px';
-            dot.style.opacity = 1; ring.style.opacity = 1;
-        });
-        document.addEventListener('mouseleave', () => { dot.style.opacity = 0; ring.style.opacity = 0; });
-        function animRing() {
-            rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
-            ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
-            requestAnimationFrame(animRing);
-        }
-        animRing();
+    document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px'; dot.style.top = my + 'px';
+        dot.style.opacity = 1; ring.style.opacity = 1;
+    });
+    document.addEventListener('mouseleave', () => { dot.style.opacity = 0; ring.style.opacity = 0; });
+    function animRing() {
+        rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+        ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+        requestAnimationFrame(animRing);
     }
+    animRing();
 
     const reveals = document.querySelectorAll('.reveal');
     const obs = new IntersectionObserver((entries) => {
@@ -922,21 +915,19 @@
         heroBg.style.transform = `scale(1.05) translateY(${y * 0.3}px)`;
     }, { passive: true });
 
-    if (window.matchMedia("(pointer: fine)").matches) {
-        document.querySelectorAll('.tilt-card').forEach(card => {
-            card.addEventListener('mousemove', e => {
-                const r = card.getBoundingClientRect();
-                const x = (e.clientX - r.left) / r.width - 0.5;
-                const y = (e.clientY - r.top) / r.height - 0.5;
-                card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-6px)`;
-                card.style.boxShadow = `${-x * 20}px ${-y * 20}px 40px rgba(45,90,66,0.12)`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
-                card.style.boxShadow = '';
-            });
+    document.querySelectorAll('.tilt-card').forEach(card => {
+        card.addEventListener('mousemove', e => {
+            const r = card.getBoundingClientRect();
+            const x = (e.clientX - r.left) / r.width - 0.5;
+            const y = (e.clientY - r.top) / r.height - 0.5;
+            card.style.transform = `perspective(1000px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) translateY(-6px)`;
+            card.style.boxShadow = `${-x * 20}px ${-y * 20}px 40px rgba(45,90,66,0.12)`;
         });
-    }
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+            card.style.boxShadow = '';
+        });
+    });
 
     const sections = document.querySelectorAll('section[id]');
     const navLinks = document.querySelectorAll('nav a');
